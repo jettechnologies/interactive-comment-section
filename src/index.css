@@ -71,4 +71,11 @@ border-spacing: 0;
       max-width: 1440px;
       margin: 0 auto;
   }
+  .input-outline{
+    @apply outline-1 outline-blue;
+  }
+}
+
+.fluid-width{
+  width:clamp(22rem, 50vw, 60rem);
 }

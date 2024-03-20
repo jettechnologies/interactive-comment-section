@@ -3,8 +3,9 @@ import editIcon from "./icon-edit.svg"
 import minusIcon from "./icon-minus.svg"
 import plusIcon from "./icon-plus.svg"
 import replyIcon from "./icon-reply.svg"
-import user from "./user.png"
+import userIcon from "./user.png"
 import commentImg from "./comment-section-3.png"
+import checkIcon from "./check.png"
 
 export {
     deleteIcon,
@@ -12,6 +13,7 @@ export {
     minusIcon,
     plusIcon,
     replyIcon,
-    user,
+    userIcon,
     commentImg,
+    checkIcon,
 }

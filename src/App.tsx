@@ -1,14 +1,17 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { CommentSection, Signup, Login } from "./pages";
+import Layout from "./components/Layout";
+import { useState } from "react";
 
 
 const App = () => {
+  const [isLogged, setIsLogged] = useState(false);
 
   return (
     <Routes>
-      <Route path="/">
-        <Route index element = {<Signup />} />
-        <Route path = "login" element = {<Login />} />
+      <Route path="/" element = {<Layout />}>
+        <Route index element = {isLogged ? <Login /> : <Signup />} />
+        {/* <Route path = "login" element = {<Login />} /> */}
 
         <Route path="comments" element = {<CommentSection />}/>
 
