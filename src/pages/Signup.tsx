@@ -1,7 +1,8 @@
 import { checkIcon, userIcon } from "../assets"
 import { useNavigate } from 'react-router-dom';
 import { useState } from "react";
-import { MD5 } from "crypto-js";
+// import { MD5 } from "crypto-js";
+import { MD5 } from "crypto-js"; 
 
 interface StateObj{
   str: string;
@@ -107,7 +108,7 @@ const formSubmit = (e:React.FormEvent<HTMLFormElement>) => {
 
   const hashedPassword = MD5(password.str).toString();
 
-  userData.userName = userName.str;
+  userData.userName = userName.str.toLocaleLowerCase();
   userData.password = hashedPassword;
   userData.imgUrl = user.imgUrl?.str;
 
