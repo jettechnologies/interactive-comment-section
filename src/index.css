@@ -79,3 +79,21 @@ border-spacing: 0;
 .fluid-width{
   width:clamp(22rem, 50vw, 60rem);
 }
+
+.comment-list{
+  grid-template-columns:4rem 1fr 4rem;
+  grid-template-rows: repeat(2, 1fr);
+}
+.comment-input{
+  grid-template-columns: 3rem 1fr 6rem;
+}
+
+@media screen and (max-width: 430px) {
+  .comment-list{
+    grid-template-rows:minmax(210px , 1fr) 42px;
+  }
+  .comment-input{
+    grid-template-rows: minmax(110px , 1fr) 42px;
+  }
+}
+
