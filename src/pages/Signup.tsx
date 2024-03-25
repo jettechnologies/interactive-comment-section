@@ -1,4 +1,5 @@
-import { checkIcon, userIcon } from "../assets"
+import { checkIcon, userIcon } from "../assets";
+// import { UserData } from "../dataModel";
 import { useNavigate } from 'react-router-dom';
 import { useState } from "react";
 // import { MD5 } from "crypto-js";

@@ -6,13 +6,13 @@ interface User {
     username: string;
   }
 
-export interface CurrentUser {
-    userName: string;
-    hashedPassword: string;
-    createdAt: Date;
-    imgUrl: string;
-}
-interface Replies {
+// export interface CurrentUser {
+//     userName: string;
+//     hashedPassword: string;
+//     createdAt: Date;
+//     imgUrl: string;
+// }
+export interface Replies {
     id: number;
     content: string;
     createdAt: string;
@@ -29,4 +29,11 @@ interface Replies {
     user: User;
     replies: Replies[];
     replyingTo?: string; // Optional field
+  }
+
+  export interface UserData{
+    userName: string;
+    password: string;
+    imgUrl?: string;
+    createdAt: Date;
   }
