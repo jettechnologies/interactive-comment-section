@@ -1,33 +1,36 @@
 import { deleteIcon, editIcon, minusIcon, plusIcon, replyIcon } from "../assets";
-import { Comment, UserData } from "../dataModel";
+import { Replies, UserData } from "../dataModel";
 import {  parse, formatDistanceToNow } from 'date-fns';
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"
 
 interface Props{
-    comment: Comment
+    reply: Replies
     currentUser: UserData
 }
 
 const humanReadableDate = (dateString:string):string =>{
     const parsedDate = parse(dateString, 'yyyy-MM-dd', new Date());
-    console.log(parsedDate);
     const distanceToNow = formatDistanceToNow(parsedDate);
     return distanceToNow;
 }
 
-const CommentList: React.FC<Props> = ({comment, currentUser}) => {
+
+const ReplyList: React.FC<Props> = ({
+    reply,
+    currentUser
+}) => {
     const [userImg, setUserImg] = useState<string>("");
 
     useEffect(() => {
       const loadImage = async () => {
         try {
-            if(comment.user.image.png.includes("images/avatars")){
-                const { default: userImage } = await import(comment.user.image.png);
+            if(reply.user.image.png.includes("images/avatars")){
+                const { default: userImage } = await import(reply.user.image.png);
                 setUserImg(userImage);
 
                 return
             }
-          setUserImg(comment.user.image.png);
+          setUserImg(reply.user.image.png);
         } catch (error) {
           console.error('Error loading image:', error);
         }
@@ -38,7 +41,7 @@ const CommentList: React.FC<Props> = ({comment, currentUser}) => {
       return () => {
         setUserImg(""); // Clear image state when component unmounts
       };
-    }, [comment.user.image.png]);
+    }, [reply.user.image.png]);
 
   return (
     <div className="w-full py-6 px-4 bg-gray-200 shadow-sm rounded-md grid comment-list">
@@ -47,7 +50,7 @@ const CommentList: React.FC<Props> = ({comment, currentUser}) => {
                 <img src={plusIcon} alt="plus icon" />
             </button>
             <span className="text-size-400 text-blue font-medium">
-                {comment.score}
+                {reply.score}
             </span>
             <button className="justify-self-end bg-transparent focus:input-outline p-1">
                 <img src={minusIcon} alt="minus icon" />
@@ -56,15 +59,12 @@ const CommentList: React.FC<Props> = ({comment, currentUser}) => {
         <div className="max-sm:col-start-1 max-sm:col-span-3 max-sm:row-start-1 max-sm:row-span-1 max-sm:mb-3 col-start-2 col-end-3  row-span-2 flex flex-col gap-y-4">
             <div className="flex gap-x-4 items-center">
                 <img src={userImg} alt="avatar icon" className = "w-10 h-10 rounded-full" />
-                <h5 className="text-size-500 font-semibold text-gray-blue-100"> {comment.user.username}</h5>
-                {comment.user.username === currentUser.userName && 
-                    <span 
-                        className="bg-blue font-medium text-white text-size-400 p-1 rounded-sm">you</span>
-                }
-                <p className="text-size-400 text-gray-blue-100 font-normal">{humanReadableDate(comment.createdAt)}</p>
+                <h5 className="text-size-500 font-semibold text-gray-blue-100"> {reply.user.username}</h5>
+                <p className="text-size-400 text-gray-blue-100 font-normal">{humanReadableDate(reply.createdAt)}</p>
             </div>
             <p className="text-size-500 text-gray-blue-100 font-meduim">
-                {comment.content}
+                <span className="text-blue font-bold mr-2">@{reply.replyingTo}</span>
+                {reply.content}
             </p>
             {/* <input 
                 type="text"  
@@ -72,12 +72,11 @@ const CommentList: React.FC<Props> = ({comment, currentUser}) => {
             /> */}
         </div>
         <div className="row-start-2 row-span-1 col-start-3 col-span-1 w-fit justify-self-end md:row-start-1 flex gap-x-2 max-sm:items-center">
-            {comment.user.username !== currentUser.userName &&<button className="bg-transparent focus:input-outline p-1 w-24 h-fit flex">
-                    <img src={replyIcon} alt="reply icon" className="w-4 h-4 mr-2"/>
-                    <p className="text-size-500 font-semibold text-blue uppercase">reply</p>
-                </button>
-            }
-            {comment.user.username === currentUser.userName && <><button className="bg-transparent focus:input-outline p-1 w-24 h-fit flex">
+            <button className="bg-transparent focus:input-outline p-1 w-24 h-fit flex">
+                <img src={replyIcon} alt="reply icon" className="w-4 h-4 mr-2"/>
+                <p className="text-size-500 font-semibold text-blue uppercase">reply</p>
+            </button>
+            {reply.user.username === currentUser.userName && <><button className="bg-transparent focus:input-outline p-1 w-24 h-fit flex">
                     <img src={deleteIcon} alt="delete icon" className="w-4 h-4 mr-2"/>
                     <p className="text-size-500 font-semibold text-soft-red uppercase">delete</p>
                 </button>
@@ -91,4 +90,4 @@ const CommentList: React.FC<Props> = ({comment, currentUser}) => {
   )
 }
 
-export default CommentList
+export default ReplyList

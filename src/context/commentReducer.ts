@@ -1,4 +1,4 @@
-import { Comment, UserData } from "../dataModel";
+import { Comment, Replies, UserData } from "../dataModel";
 
 export const initialState = {
     comments: [] as Comment[],
@@ -10,7 +10,7 @@ type Action =
     | { type: "ADD_COMMENT"; payload: { comment: Comment } }
     | { type: "CREATE_USER"; payload: {user: UserData} }
     | { type: "EDIT_COMMENT"; payload: { ids: { comment: number; reply?: number }; value: string } }
-    | { type: "REPLY_COMMENT"; payload: { ids: { comment: number }; value: string } }
+    | { type: "REPLY_COMMENT"; payload: { ids: { comment: number }; value: Replies } }
     | { type: "INCREMENT_SCORE"; payload: { ids: { comment: number; reply?: number } } }
     | { type: "DECREMENT_SCORE"; payload: { ids: { comment: number; reply?: number } } }
     | { type: "DELETE_COMMENT"; payload: { ids: { comment: number; reply?: number } } };
@@ -40,18 +40,30 @@ const commentReducer = (state = initialState, action: Action) => {
     }
 };
 
-const updateComment = (state: typeof initialState, payload?: Action["payload"]) => {
-    if (!payload || !payload.ids) return state;
+/**
+ * Updates a comment in the state.
+ * @param state The current state.
+ * @param payload The payload containing the comment and reply IDs, and the new content.
+ * @returns The updated state.
+ */
+const updateComment = (
+    state: typeof initialState,
+    payload?: Action["payload"] & { ids: { comment: number; reply?: number }; value: string },
+): typeof initialState => {
+    if (!payload || !payload.ids || !payload.value) {
+        return state;
+    }
     const { comment, reply } = payload.ids;
-    if(reply){
+    if (reply) {
         return {
             ...state,
-            comments: state.comments.map(commentItem =>
+            comments: state.comments.map((commentItem: Comment) =>
                 commentItem.id === comment
                     ? {
                           ...commentItem,
-                          replies: state.comments[comment].replies.map(replyItem =>
-                              replyItem.id === reply ? { ...replyItem, content: payload.value } : replyItem);
+                          replies: commentItem.replies.map((replyItem: Replies) =>
+                              replyItem.id === reply ? { ...replyItem, content: payload.value } : replyItem,
+                          ),
                       }
                     : commentItem,
             ),
@@ -60,133 +72,99 @@ const updateComment = (state: typeof initialState, payload?: Action["payload"]) 
 
     return {
         ...state,
-        comments: state.comments.map(commentItem =>
+        comments: state.comments.map((commentItem: Comment) =>
             commentItem.id === comment ? { ...commentItem, content: payload.value } : commentItem,
         ),
     };
 };
 
-const createReply = (state: typeof initialState, payload?: Action["payload"]) => {
+const createReply = (
+    state: typeof initialState,
+    payload?: Action["payload"] & { ids: { comment: number }; value: Replies },
+): typeof initialState => {
     if (!payload || !payload.ids) return state;
     const { comment } = payload.ids;
-    return {
-        ...state,
-        comments: state.comments.map(commentItem =>
-            commentItem.id === comment
-                ? {
-                      ...commentItem,
-                      replies: [...commentItem.replies, payload.value],
-                  }
-                : commentItem,
-        ),
-    };
+    const updatedComments = state.comments.map((commentItem: Comment) => {
+        if (commentItem.id === comment) {
+            return {
+                ...commentItem,
+                replies: [...commentItem.replies, payload.value],
+            };
+        } else {
+            return commentItem;
+        }
+    });
+    return { ...state, comments: updatedComments };
 };
 
-const incrementScore = (state: typeof initialState, payload?: Action["payload"]) => {
-    if (!payload || !payload.ids) return state;
-    const { comment, reply } = payload.ids;
-    if(reply){
-        return {
-            ...state,
-            comments: state.comments.map(commentItem =>
-                commentItem.id === comment
-                    ? {
-                          ...commentItem,
-                          replies: state.comments[comment].replies.map(replyItem =>
-                              replyItem.id === reply ? { ...replyItem, score: replyItem.score + 1 } : replyItem),
-                      }
-                    : commentItem,
-            ),
-        };
-    }
-
-    return {
-        ...state,
-        comments: state.comments.map(commentItem =>
-            commentItem.id === comment
-                ? {
-                      ...commentItem,
-                      score: commentItem.score + 1 
-                  }
-                : commentItem,
-        ),
-    };
-}
-
-const decrementScore = (state: typeof initialState, payload?: Action["payload"]) => {
-    if (!payload || !payload.ids) return state;
-    const { comment, reply } = payload.ids;
-    if(reply){
-        return {
-            ...state,
-            comments: state.comments.map(commentItem =>
-                commentItem.id === comment
-                    ? {
-                          ...commentItem,
-                          replies: state.comments[comment].replies.map(replyItem =>
-                              replyItem.id === reply ? { ...replyItem, score: replyItem.score - 1 } : replyItem),
-                      }
-                    : commentItem,
-            ),
-        };
-    }
-
-    return {
-        ...state,
-        comments: state.comments.map(commentItem =>
-            commentItem.id === comment
-                ? {
-                      ...commentItem,
-                      score: commentItem.score - 1
-                  }
-                : commentItem,
-        ),
-    };
-}
-
-// const deleteCommentOrReply = (state: typeof initialState, payload?: Action["payload"]) => {
-//     if (!payload || !payload.ids) return state;
-//     const { comment, reply } = payload.ids;
-//     return {
-//         ...state,
-//         comments: state.comments.map(commentItem =>
-//             commentItem.id === comment
-//                 ? {
-//                       ...commentItem,
-//                       replies: reply ? commentItem.replies.filter(replyItem => replyItem.id !== reply) : commentItem.replies,
-//                   }
-//                 : reply
-//                 ? commentItem
-//                 : {
-//                       ...commentItem,
-//                       replies: commentItem.replies,
-//                   },
-//         ),
-//     };
-// };
-
-const deleteCommentOrReply = (state: typeof initialState, payload?: Action["payload"]) => {
-    if (!payload || !payload.ids) return state;
-    const { comment, reply } = payload.ids;
-
-    if(reply){
-        return {
-                ...state,
-                comments: state.comments.map(commentItem =>
-                    commentItem.id === comment
-                        ? {
-                            ...commentItem,
-                            replies: reply ? commentItem.replies.filter(replyItem => replyItem.id !== reply) : commentItem.replies,
+const incrementScore = (
+    state: typeof initialState, 
+    payload?: Action["payload"] & { ids: { comment: number, reply?: number } },
+    ): typeof initialState => {
+        if (!payload || !payload.ids) return state;
+        const { comment, reply } = payload.ids;
+        const updatedComments = state.comments.map((commentItem: Comment) => {
+            if (commentItem.id === comment) {
+                const updatedReplies = reply
+                    ? commentItem.replies.map((replyItem: Replies) => {
+                        if (replyItem.id === reply) {
+                            return { ...replyItem, score: replyItem.score + 1 };
+                        } else {
+                            return replyItem;
                         }
-                        : commentItem)
-        }
-    }
+                    })
+                    : commentItem.replies;
+                return { ...commentItem, replies: updatedReplies };
+            } else {
+                return commentItem;
+            }
+        });
+        return { ...state, comments: updatedComments };
+};
 
-    return {
-        ...state,
-        comments: state.comments.filter(commentItem => commentItem.id !== comment)
-    }
-}
+const decrementScore = (
+    state: typeof initialState, 
+    payload?: Action["payload"] & { ids: { comment: number, reply?: number } },
+    ): typeof initialState => {
+    if (!payload || !payload.ids) return state;
+    const { comment, reply } = payload.ids;
+    const updatedComments = state.comments.map((commentItem: Comment) => {
+        if (commentItem.id === comment) {
+            const updatedReplies = reply
+                ? commentItem.replies.map((replyItem: Replies) => {
+                      if (replyItem.id === reply) {
+                          return { ...replyItem, score: replyItem.score - 1 };
+                      } else {
+                          return replyItem;
+                      }
+                  })
+                : commentItem.replies;
+            return { ...commentItem, replies: updatedReplies };
+        } else {
+            return commentItem;
+        }
+    });
+    return { ...state, comments: updatedComments };
+};
+
+const deleteCommentOrReply = (
+    state: typeof initialState, 
+    payload?: Action["payload"] & { ids: { comment: number, reply?: number } },
+    ): typeof initialState => {
+    if (!payload || !payload.ids) return state;
+    const { comment, reply } = payload.ids;
+    const updatedComments = reply
+        ? state.comments.map((commentItem: Comment) => {
+              if (commentItem.id === comment) {
+                  const updatedReplies = commentItem.replies.filter((replyItem: Replies) => replyItem.id !== reply);
+                  return { ...commentItem, replies: updatedReplies };
+              } else {
+                  return commentItem;
+              }
+          })
+        : state.comments.filter((commentItem: Comment) => commentItem.id !== comment);
+    return { ...state, comments: updatedComments };
+};
 
 export default commentReducer;
 

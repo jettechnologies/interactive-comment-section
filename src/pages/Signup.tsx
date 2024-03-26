@@ -1,9 +1,9 @@
 import { checkIcon, userIcon } from "../assets";
-// import { UserData } from "../dataModel";
+import { UserData } from "../dataModel";
 import { useNavigate } from 'react-router-dom';
 import { useState } from "react";
-// import { MD5 } from "crypto-js";
-import { MD5 } from "crypto-js"; 
+import bcrypt from 'bcryptjs';
+import useComments from "../context/CommentContext";
 
 interface StateObj{
   str: string;
@@ -16,12 +16,6 @@ interface User{
   imgUrl?: StateObj;
 }
 
-interface UserData{
-  userName: string;
-  password: string;
-  imgUrl?: string;
-  createdAt: Date;
-}
 
 const Signup = () => {
   const [user, setUser] = useState<User>({
@@ -32,6 +26,7 @@ const Signup = () => {
 
   const [completed, setCompleted] = useState(false);
   const navigate = useNavigate();
+  const { createUser } = useComments();
 
 
   // setting the values of the input fields
@@ -39,7 +34,7 @@ const Signup = () => {
     const target = e.target as HTMLInputElement | HTMLTextAreaElement;
     const { name, value } = target;
 
-    setUser({ ...user, [name]: {str: value, error: false} });
+    setUser({ ...user, [name]: {str: value.toLocaleLowerCase(), error: false} });
 }
 
 const handleImgUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,7 +89,7 @@ const formSubmit = (e:React.FormEvent<HTMLFormElement>) => {
   const userData: UserData = {
     userName: "",
     password: "",
-    createdAt: new Date()
+    createdAt: new Date(),
   };
 
  
@@ -107,11 +102,17 @@ const formSubmit = (e:React.FormEvent<HTMLFormElement>) => {
     return;
   }
 
-  const hashedPassword = MD5(password.str).toString();
+  const hashedPassword = bcrypt.hashSync(password.str, 10);
 
-  userData.userName = userName.str.toLocaleLowerCase();
+  console.log(hashedPassword, password.str);
+
+  userData.userName = userName.str;
   userData.password = hashedPassword;
   userData.imgUrl = user.imgUrl?.str;
+
+  console.log(userData);
+
+  createUser(userData);
 
   setUser({
     userName: {str: "", error: false},
@@ -141,7 +142,7 @@ const formSubmit = (e:React.FormEvent<HTMLFormElement>) => {
                   </div> 
                   <div className="w-full flex flex-col gap-y-4 mb-2">
                     <label htmlFor="password" className="text-size-500 font-bold text-dark-blue">Password</label>
-                    <input type="text" id = "password" name="password" value={user.password.str} onChange={handleInputChange} className="h-[3rem] input-outline bg-white border-2 border-gray-300 rounded-md pl-2"/>
+                    <input type="password" id = "password" name="password" value={user.password.str} onChange={handleInputChange} className="h-[3rem] input-outline bg-white border-2 border-gray-300 rounded-md pl-2"/>
                     {user.password.error && <p className="text-soft-red text-size-400 font-normal">Password shouldn't be empty and should be within 8 to 15 characters</p>}
                   </div> 
                   <div className="w-full flex flex-col gap-y-4 mb-2">

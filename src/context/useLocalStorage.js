@@ -1,4 +1,4 @@
-export const useLocalStorage = (key) => {
+const useLocalStorage = (key) => {
     const setItem = (value) => {
       try {
         window.localStorage.setItem(key, JSON.stringify(value));
@@ -9,3 +9,5 @@ export const useLocalStorage = (key) => {
   
     return { setItem};
   };
+
+export default useLocalStorage;

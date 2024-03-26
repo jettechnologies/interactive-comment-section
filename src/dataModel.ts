@@ -1,7 +1,7 @@
 interface User {
     image: {
         png: string;
-        webp: string;
+        webp?: string;
     };
     username: string;
   }
@@ -12,6 +12,11 @@ interface User {
 //     createdAt: Date;
 //     imgUrl: string;
 // }
+
+export interface LocalStorageData {
+  currentUser: UserData;
+  comments: Comment[];
+}
 export interface Replies {
     id: number;
     content: string;

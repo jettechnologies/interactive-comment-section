@@ -1,7 +1,8 @@
 import { userIcon } from "../assets";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { MD5 } from "crypto-js"; 
+import bcrypt from "bcryptjs";
+import { LocalStorageData } from "../dataModel";
 
 interface User{
   userName: string;
@@ -15,8 +16,29 @@ const Login = () => {
     password: "",
     error: {msg: "", status: false}
   });
+  const [userData, setUserData] = useState({
+    userName: "",
+    password: "",
+  })
 
   const navigate = useNavigate();
+
+  useEffect(() =>{
+    const localStorage: string | null = window.localStorage.getItem("comments");
+        let localStorageData: LocalStorageData | undefined;
+
+        // check to ensure that the localStorage is not empty
+        localStorage !== null ? localStorageData = JSON.parse(localStorage) : localStorageData = undefined; 
+
+        if (localStorageData?.currentUser !== undefined && Object.keys(localStorageData.currentUser).length > 0) {
+          setUserData(localStorageData.currentUser);
+        }
+  }, []);
+
+  const passwordCompare = (enteredPassword: string, hashedPassword: string): boolean => {
+    return bcrypt.compareSync(enteredPassword, hashedPassword); // Compare passwords
+  };
+
     // setting the values of the input fields
     function handleInputChange(e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>){
       const target = e.target as HTMLInputElement | HTMLTextAreaElement;
@@ -25,33 +47,32 @@ const Login = () => {
       setUser({ ...user, [name]: value.toLocaleLowerCase() });
     }
 
-    console.log(user);
-
     const handleFormSubmit = (e:React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       const {userName, password} = user;
       let msg = "";
-      const hashedPassword: string = MD5(password)
-
-      console.log(userName, password);
-
+      // const hashedPassword:string = bcrypt.hashSync(password);
       // would need to sort out the comparsion with the data been savd in the localstorage and the data been inputed by the user
 
-      if(userName !== "john"){
+      const isPasswordCorrect = passwordCompare(password, userData.password);
+
+      console.log(isPasswordCorrect);
+
+      if(userName !== userData.userName){
         msg = "Username doesn't match"
         console.log(msg);
         setUser({...user, error:{msg: msg, status: true}});
 
         return;
       }
-      else if(hashedPassword !== "tom@2022"){
+      else if(!isPasswordCorrect){
         msg = "Password doesn't match"
-        console.log(msg);
+        console.log(msg); 
         setUser({...user, error:{msg: msg, status: true}});
-        
+      
         return;
       }
-
+      
       setUser({
         userName: "",
         password: "",
@@ -81,7 +102,7 @@ const Login = () => {
                 </div> 
                 <div className="w-full flex flex-col gap-y-4 mb-2">
                   <label htmlFor="password" className="text-size-500 font-bold text-dark-blue">Password</label>
-                  <input type="text" id = "password" name="password" className="h-[3rem] input-outline bg-white border-2 border-gray-300 rounded-md pl-2" onChange={handleInputChange}/>
+                  <input type="password" id = "password" name="password" className="h-[3rem] input-outline bg-white border-2 border-gray-300 rounded-md pl-2" onChange={handleInputChange}/>
                 </div> 
                 <button type = "submit" className="w-full h-12 bg-blue text-white font-bold text-size-500 rounded-md mt-6">Login</button>
               </form>
