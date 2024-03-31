@@ -51,7 +51,7 @@ const Login = () => {
       e.preventDefault();
       const {userName, password} = user;
       let msg = "";
-      // const hashedPassword:string = bcrypt.hashSync(password);
+      
       // would need to sort out the comparsion with the data been savd in the localstorage and the data been inputed by the user
 
       const isPasswordCorrect = passwordCompare(password, userData.password);

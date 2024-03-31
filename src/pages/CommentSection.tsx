@@ -1,21 +1,30 @@
 import CommentInput from "../components/CommentInput";
 import CommentList from "../components/CommentList";
 import ReplyList from "../components/ReplyList";
-import { Comment, Replies } from "../dataModel";
+import { Comments, Replies } from "../dataModel";
 import useComments from "../context/CommentContext";
 
 const CommentSection = () => {
   const { comments, currentUser, addComment } = useComments();
-
   
-  const commentList = comments.map((comment:Comment)=> (
+  const commentList = comments.map((comment:Comments)=> (
     <li className="w-full h-fit" key = {comment.id}>
         <CommentList comment={comment} currentUser={currentUser} />
-        <ul className="w-fit h-fit flex flex-col gap-y-4 items-end">
+        <ul className="h-fit flex flex-col gap-y-4 items-end">
           {comment.replies.length > 0 && comment.replies.map((reply:Replies) => {
             return (
               <li className="w-[90%] h-fit first:mt-4" key = {reply.id}>
-                <ReplyList reply={reply} currentUser={currentUser} />
+                <ReplyList reply={reply} currentReply = {reply} currentUser={currentUser} />
+                <ul className="h-fit flex flex-col gap-y-4 items-end">
+                  {reply.replies && reply.replies.length > 0 && reply.replies.map((reply:Replies) => {
+                    console.log(reply, comment);
+                    return (
+                      <li className="w-[90%] h-fit first:mt-4" key = {reply.id}>
+                          <ReplyList reply={reply} currentUser={currentUser} />
+                      </li>
+                    )}
+                  )}
+                  </ul>
               </li>
             )
           })}

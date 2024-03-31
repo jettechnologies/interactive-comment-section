@@ -2,14 +2,17 @@
 import { createContext, useCallback, useContext, useReducer, useEffect } from "react";
 import commentReducer, {initialState} from "./commentReducer";
 import useLocalStorage from "./useLocalStorage";
-import { Comment, UserData, LocalStorageData } from "../dataModel";
+import { Comments, UserData, LocalStorageData, Replies } from "../dataModel";
 import { format, sub } from 'date-fns';
+import { nanoid } from "nanoid";
+import _ from 'lodash';
 import data from "../data";
 
 interface CommentContextType {
-    comments: Comment[],
+    comments: Comments[],
     currentUser: UserData,
-    addComment: (comment:Comment) => void;
+    addComment: (comment:Comments) => void;
+    replyComment: ( id: string, value: Replies    ) => void;
     // editComment: (ids: { comment: number; reply?: number }, value: string) => void;
     createUser: (user: UserData) => void;
 }
@@ -32,32 +35,6 @@ export const CommentProvider: React.FC<{children: React.ReactNode}> =  ({ childr
         return format(pastDate, formatString);
     }
 
-    
-// const parseAndFormat = (dateExpression: string, formatString: string): string => {
-//     const expressionParts = dateExpression.split(' ');
-//     const quantity = parseInt(expressionParts[0]);
-//     const unit = expressionParts[1];
-//     const currentDate = new Date();
-
-//     let pastDate;
-
-//     // Calculate the past date based on the provided unit
-//     if (unit === 'month') {
-//         pastDate = sub(currentDate, { months: quantity });
-//     } else if (unit === 'day') {
-//         pastDate = sub(currentDate, { days: quantity });
-//     } else if (unit === 'hour') {
-//         pastDate = sub(currentDate, { hours: quantity });
-//     } else if (unit === 'minute') {
-//         pastDate = sub(currentDate, { minutes: quantity });
-//     } else {
-//         throw new Error('Invalid unit provided');
-//     }
-
-//     // Format the past date using the provided format string
-//     return format(pastDate, formatString);
-// };
-
     useEffect(() =>{
         const localStorage: string | null = window.localStorage.getItem("comments");
         let localStorageData = "";
@@ -69,14 +46,14 @@ export const CommentProvider: React.FC<{children: React.ReactNode}> =  ({ childr
             const updatedResult = data.comments.map(comment => {
                 return{
                     ...comment,
+                    id: nanoid(),
                     createdAt: parseAndFormat(comment.createdAt, 'yyyy-MM-dd'),
-                    replies: comment.replies.length > 0 && comment.replies.map(reply => {
+                    replies: comment.replies.length > 0 ? comment.replies.map(reply => {
                         return {
                             ...reply,
                             createdAt: parseAndFormat(reply.createdAt, 'yyyy-MM-dd')
                         };
-                    })
-                    
+                    }) : comment.replies
                 }
             });
             console.log(updatedResult);
@@ -121,20 +98,37 @@ export const CommentProvider: React.FC<{children: React.ReactNode}> =  ({ childr
             
     },[]);
 
-    const addComment = useCallback((comment: Comment) => {
-        const lastId = state.comments[state.comments.length - 1].id;
-        const currentId: number = lastId + 1;
-        comment.id = currentId;
-        console.log(comment);
+    // useEffect to check if the object been stored in localstorage is the equals as the local state
+    useEffect(() =>{
+        const localStorage: string | null = window.localStorage.getItem("comments");
+        let localStorageData: LocalStorageData | undefined;
+
+        // check to ensure that the localStorage is not empty
+        localStorage !== null ? localStorageData = JSON.parse(localStorage) : localStorageData = undefined;    
+    
+        if(localStorageData){
+            const {comments} = localStorageData;
+
+            const isEqual = _.isEqual(comments, state.comments);
+
+            if(!isEqual){
+                localStorageData = {...localStorageData, comments: state.comments};
+                setItem(localStorageData);
+            }
+        }
+    }, [setItem, state.comments]);
+
+
+    const addComment = useCallback((comment: Comments) => {
         dispatch({ type: "ADD_COMMENT", payload: { comment } });
 
-        const updatedState = {
-            currentUser: state.currentUser,
-            comments: [...state.comments, comment],
-        };
+        // const updatedState = {
+        //     currentUser: state.currentUser,
+        //     comments: [...state.comments, comment],
+        // };
 
-        setItem(updatedState)
-    }, [state.comments, setItem, state.currentUser]);
+        // setItem(updatedState)
+    }, []);
 
     const createUser = useCallback((user: UserData) => {
         dispatch({ type: "CREATE_USER", payload: { user } });
@@ -150,11 +144,28 @@ export const CommentProvider: React.FC<{children: React.ReactNode}> =  ({ childr
 
     }, [state.comments, setItem])
 
+
+
+    const replyComment = useCallback((id: string, reply: Replies) => {
+        dispatch({ type: "REPLY_COMMENT", payload: { id, reply } });
+
+        // const updatedState = {
+        //     currentUser: state.currentUser,
+        //     comments: state.comments,
+        // };
+
+        // console.log(updatedState, reply);
+
+        // setItem(updatedState);
+        
+    }, [])
+
     const value = {
         comments: state.comments,
         currentUser: state.currentUser,
         addComment: addComment,
         createUser: createUser,
+        replyComment,
     };
     
     return (

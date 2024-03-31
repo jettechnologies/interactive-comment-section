@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { UserData, Comment } from "../dataModel"
+import { UserData, Comments } from "../dataModel"
+import { nanoid } from "nanoid";
 
 interface Props {
-  addComment: (comment:Comment) => void;
+  addComment: (comment:Comments) => void;
   currentUser: UserData;
 }
 
@@ -19,7 +20,7 @@ const CommentInput:React.FC<Props> = ({
     const userImg = currentUser.imgUrl && currentUser.imgUrl;
 
     const newComment = {
-      id: 0,
+      id: nanoid(),
       content: comment,
       createdAt: formattedDateString,
       score: 0,

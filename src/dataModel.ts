@@ -6,34 +6,27 @@ interface User {
     username: string;
   }
 
-// export interface CurrentUser {
-//     userName: string;
-//     hashedPassword: string;
-//     createdAt: Date;
-//     imgUrl: string;
-// }
+interface Comment{
+  id: string;
+  content: string;
+  createdAt: string;
+  score: number;
+  user: User;
+}
 
 export interface LocalStorageData {
   currentUser: UserData;
   comments: Comment[];
 }
-export interface Replies {
-    id: number;
-    content: string;
-    createdAt: string;
-    score: number;
-    user: User;
-    replyingTo?: string;
+
+
+export interface Replies extends Comment {
+    replyingTo: string;
+    replies?: Replies[] | [];
   }
   
-  export interface Comment {
-    id: number;
-    content: string;
-    createdAt: string;
-    score: number;
-    user: User;
-    replies: Replies[];
-    replyingTo?: string; // Optional field
+  export interface Comments extends Comment {
+    replies: Replies[] | [];
   }
 
   export interface UserData{
