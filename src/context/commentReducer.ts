@@ -54,13 +54,28 @@ const updateComment = (
         return state;
     }
 
-    const updateContent = (comments: Comments[]): Comments[] => {
-        return comments.map(comment => {
+/**
+ * Updates a comment in the state.
+ * @param state The current state.
+ * @param payload The payload containing the comment and reply IDs, and the new content.
+ * @returns The updated state.
+ */
+const updateComment = (
+    state: typeof initialState,
+    payload?: Action["payload"] & { id: string; value: string },
+): typeof initialState => {
+    if (!payload || !payload.id || !payload.value) {
+        return state;
+    }
+
+    const updateCommentContent = (comments: Comments[]): Comments[] => {
+        return comments.map((comment: Comments): Comments => {
             if (comment.id === payload.id) {
                 return { ...comment, content: payload.value };
             }
-            if (comment.replies && comment.replies.length > 0) {
-                return { ...comment, replies: updateContent(comment.replies) };
+            if (comment.replies) {
+                const updatedReplies = updateCommentContent(comment.replies);
+                return { ...comment, replies: updatedReplies };
             }
             return comment;
         });
@@ -68,9 +83,10 @@ const updateComment = (
 
     return {
         ...state,
-        comments: updateContent(state.comments),
+        comments: updateCommentContent(state.comments),
     };
 };
+}
 
 const createReply = (
     state: typeof initialState,
@@ -128,7 +144,7 @@ const decrementScore = (
     const updateContent = (comments: Comments[]): Comments[] => {
         return comments.map(comment => {
             if (comment.id === payload.id) {
-                return { ...comment, score: comment.score - 1 };
+                return { ...comment, score: comment.score > 0 ? comment.score - 1 : comment.score };
             }
             if (comment.replies && comment.replies.length > 0) {
                 return { ...comment, replies: updateContent(comment.replies) };

@@ -16,7 +16,7 @@ interface Comment{
 
 export interface LocalStorageData {
   currentUser: UserData;
-  comments: Comment[];
+  comments: Comments[];
 }
 
 
@@ -32,6 +32,6 @@ export interface Replies extends Comment {
   export interface UserData{
     userName: string;
     password: string;
-    imgUrl?: string;
-    createdAt: Date;
+    imgUrl: string;
+    createdAt: string;
   }

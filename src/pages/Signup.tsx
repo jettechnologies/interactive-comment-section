@@ -2,7 +2,7 @@ import { checkIcon, userIcon } from "../assets";
 import { UserData } from "../dataModel";
 import { useNavigate } from 'react-router-dom';
 import { useState } from "react";
-import bcrypt from 'bcryptjs';
+import bcrypt from "bcryptjs-react";
 import useComments from "../context/CommentContext";
 
 interface StateObj{
@@ -13,7 +13,7 @@ interface StateObj{
 interface User{
   userName:StateObj;
   password: StateObj;
-  imgUrl?: StateObj;
+  imgUrl: StateObj;
 }
 
 
@@ -89,7 +89,8 @@ const formSubmit = (e:React.FormEvent<HTMLFormElement>) => {
   const userData: UserData = {
     userName: "",
     password: "",
-    createdAt: new Date(),
+    imgUrl: "",
+    createdAt: new Date().toISOString(),
   };
 
  

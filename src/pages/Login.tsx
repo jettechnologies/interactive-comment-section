@@ -1,7 +1,8 @@
 import { userIcon } from "../assets";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import bcrypt from "bcryptjs";
+// import bcrypt from "bcryptjs";
+import bcrypt from "bcryptjs-react";
 import { LocalStorageData } from "../dataModel";
 
 interface User{
@@ -55,8 +56,6 @@ const Login = () => {
       // would need to sort out the comparsion with the data been savd in the localstorage and the data been inputed by the user
 
       const isPasswordCorrect = passwordCompare(password, userData.password);
-
-      console.log(isPasswordCorrect);
 
       if(userName !== userData.userName){
         msg = "Username doesn't match"

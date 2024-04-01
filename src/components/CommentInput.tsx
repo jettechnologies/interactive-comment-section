@@ -19,7 +19,7 @@ const CommentInput:React.FC<Props> = ({
 
     const userImg = currentUser.imgUrl && currentUser.imgUrl;
 
-    const newComment = {
+    const newComment:Comments = {
       id: nanoid(),
       content: comment,
       createdAt: formattedDateString,

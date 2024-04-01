@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
+    "bcryptjs-react": "^2.4.6",
     "date-fns": "^3.6.0",
     "lodash": "^4.17.21",
     "nanoid": "^5.0.6",

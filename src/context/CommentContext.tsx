@@ -5,7 +5,7 @@ import useLocalStorage from "./useLocalStorage";
 import { Comments, UserData, LocalStorageData, Replies } from "../dataModel";
 import { format, sub } from 'date-fns';
 import { nanoid } from "nanoid";
-import _ from 'lodash';
+import isEqual from 'lodash/isEqual';
 import data from "../data";
 
 interface CommentContextType {
@@ -13,8 +13,10 @@ interface CommentContextType {
     currentUser: UserData,
     addComment: (comment:Comments) => void;
     replyComment: ( id: string, value: Replies    ) => void;
-    // editComment: (ids: { comment: number; reply?: number }, value: string) => void;
+    editComment: (id: string, value: string) => void;
+    deleteComment: (id:string) => void;
     createUser: (user: UserData) => void;
+    scoreIncrementOrDecrement: (id:string, type:string) => void;
 }
 
 
@@ -22,7 +24,7 @@ const CommentContext  = createContext<CommentContextType | null>(null);
 
 export const CommentProvider: React.FC<{children: React.ReactNode}> =  ({ children }) => {
     const [state, dispatch] = useReducer(commentReducer, initialState);
-    const { setItem } = useLocalStorage("comments", []);
+    const { setItem } = useLocalStorage("comments");
 
     // Function to parse and format human-readable date expressions
     const parseAndFormat = (dateExpression:string, formatString:string):string => {
@@ -67,25 +69,40 @@ export const CommentProvider: React.FC<{children: React.ReactNode}> =  ({ childr
          }
     }, [setItem, state.currentUser]);
 
-    console.log(state.comments)
     // Here is a useEffect for handling the logging of data from the localstorage to the local states provided
-
     useEffect(() =>{
         const localStorage: string | null = window.localStorage.getItem("comments");
         let localStorageData: LocalStorageData | undefined;
 
         // check to ensure that the localStorage is not empty
         localStorage !== null ? localStorageData = JSON.parse(localStorage) : localStorageData = undefined;    
-        
-        
     
         if(localStorageData){
+            let timeDiff:number;
             const {currentUser, comments} = localStorageData;
-    
-            dispatch({
-                type: "CREATE_USER",
-                payload: {user: currentUser},
-            });
+            const loginDate  = currentUser.createdAt.split("T")[0];
+            const currentTime = Date.now();
+            timeDiff = Math.abs((currentTime - Date.parse(loginDate)) / (1000*60*60*24));
+            timeDiff = Math.floor(timeDiff);
+
+            console.log(timeDiff);
+
+            if(timeDiff > 3){
+                const localStorageObj = {currentUser: {}, comments};
+                console.log(localStorageObj);
+                // setItem(localStorageObj);
+                window.localStorage.setItem("comments", JSON.stringify(localStorageObj));
+            }
+
+            // conditional to check if the current user object is not empty
+            const isNotEmpty = Object.entries(currentUser).length !== 0;
+
+            if(isNotEmpty){
+                dispatch({
+                    type: "CREATE_USER",
+                    payload: {user: currentUser},
+                });
+            }
     
             // if statement for setting the comments object
             if(comments.length > 0){
@@ -109,9 +126,9 @@ export const CommentProvider: React.FC<{children: React.ReactNode}> =  ({ childr
         if(localStorageData){
             const {comments} = localStorageData;
 
-            const isEqual = _.isEqual(comments, state.comments);
+            const isDataEqual = isEqual(comments, state.comments);
 
-            if(!isEqual){
+            if(!isDataEqual){
                 localStorageData = {...localStorageData, comments: state.comments};
                 setItem(localStorageData);
             }
@@ -121,13 +138,6 @@ export const CommentProvider: React.FC<{children: React.ReactNode}> =  ({ childr
 
     const addComment = useCallback((comment: Comments) => {
         dispatch({ type: "ADD_COMMENT", payload: { comment } });
-
-        // const updatedState = {
-        //     currentUser: state.currentUser,
-        //     comments: [...state.comments, comment],
-        // };
-
-        // setItem(updatedState)
     }, []);
 
     const createUser = useCallback((user: UserData) => {
@@ -148,17 +158,30 @@ export const CommentProvider: React.FC<{children: React.ReactNode}> =  ({ childr
 
     const replyComment = useCallback((id: string, reply: Replies) => {
         dispatch({ type: "REPLY_COMMENT", payload: { id, reply } });
-
-        // const updatedState = {
-        //     currentUser: state.currentUser,
-        //     comments: state.comments,
-        // };
-
-        // console.log(updatedState, reply);
-
-        // setItem(updatedState);
-        
     }, [])
+
+    const editComment = useCallback((id:string, value:string) =>[
+        dispatch({
+            type: "EDIT_COMMENT",
+            payload: {id, value}
+        })
+    ], []);
+
+    const deleteComment = useCallback((id:string) =>[
+        dispatch({
+            type: "DELETE_COMMENT",
+            payload: {id}
+        })
+    ], []);
+
+    const scoreIncrementOrDecrement = useCallback((id: string, type: string) => {
+        if (type === "increment") {
+            dispatch({ type: "INCREMENT_SCORE", payload: { id } });
+        } else if (type === "decrement") {
+            dispatch({ type: "DECREMENT_SCORE", payload: { id } });
+        }
+    }, [])
+
 
     const value = {
         comments: state.comments,
@@ -166,6 +189,9 @@ export const CommentProvider: React.FC<{children: React.ReactNode}> =  ({ childr
         addComment: addComment,
         createUser: createUser,
         replyComment,
+        editComment,
+        deleteComment,
+        scoreIncrementOrDecrement,
     };
     
     return (
@@ -179,7 +205,7 @@ export const CommentProvider: React.FC<{children: React.ReactNode}> =  ({ childr
 const useComments = () => {
     const context = useContext(CommentContext);
   
-    if (context === undefined) {
+    if (context === undefined || context === null) {
       throw new Error("useComments must be used within TodoContext");
     }
     
