@@ -54,7 +54,9 @@ const ReplyList: React.FC<Props> = ({
     const loadImage = async (): Promise<void> => {
       try {
         if (reply.user.image.png.includes("images/avatars")) {
-          const userImage = await import(getImagePath(reply.user.image.png));
+          const userImage = await import(
+            /* @vite-ignore */ getImagePath(reply.user.image.png)
+          );
           setUserImg(userImage);
           return;
         }

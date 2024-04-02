@@ -48,7 +48,9 @@ const CommentList: React.FC<Props> = ({
     const loadImage = async (): Promise<void> => {
       try {
         if (comment.user.image.png.includes("images/avatars")) {
-          const userImage = await import(getImagePath(comment.user.image.png));
+          const userImage = await import(
+            /* @vite-ignore */ getImagePath(comment.user.image.png)
+          );
           setUserImg(userImage);
           return;
         }
