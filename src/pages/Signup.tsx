@@ -162,6 +162,7 @@ const formSubmit = (e:React.FormEvent<HTMLFormElement>) => {
         <div className="w-[23rem] pt-6 pb-2 px-4 shadow-lg shadow-white rounded-md bg-white flex flex-col items-center gap-y-4">
             <img src={checkIcon} alt="congratulation icon" className="w-20 h-20"/>
             <p className="font-medium text-size-500 uppercase">Thanks for signing up</p>
+            <p className="font-thin text-size-400">User's account can only last for 3 days</p>
             <button type = "button" className="w-full h-12 bg-blue text-white font-bold text-size-500 rounded-md mt-6" onClick = {() => navigate("/comments")}>Continue</button>
         </div>
       </div>}
