@@ -47,7 +47,7 @@ const ReplyList: React.FC<Props> = ({
   const { replyComment, editComment, scoreIncrementOrDecrement } =
     useComments();
 
-  // const comment = currentComment && currentComment;
+
   const replyTo = currentReply && currentReply;
 
   useEffect(() => {
@@ -55,7 +55,7 @@ const ReplyList: React.FC<Props> = ({
       try {
         if (reply.user.image.png.includes("images/avatars")) {
           const userImage = await import(
-            /* @vite-ignore */ getImagePath(reply.user.image.png)
+            /* @vite-ignore */ getImagePath(reply?.user.image.png)
           );
           setUserImg(userImage);
           return;
@@ -68,6 +68,22 @@ const ReplyList: React.FC<Props> = ({
 
     loadImage();
 
+    // const loadImage = async () => {
+    //   try {
+    //       if(reply.user.image.png.includes("images/avatars")){
+    //          /* @vite-ignore */ const { default: userImage } = await import(`./${reply.user.image.png}`);
+    //           setUserImg(userImage);
+
+    //           return
+    //       }
+    //     setUserImg(reply.user.image.png);
+    //   } catch (error) {
+    //     console.error('Error loading image:', error);
+    //   }
+    // };
+
+    // loadImage();
+
     return () => {
       setUserImg(""); // Clear image state when component unmounts
     };
@@ -76,7 +92,7 @@ const ReplyList: React.FC<Props> = ({
   return (
     <div className="w-full h-fit flex flex-col gap-y-3">
       <div className="w-full py-6 px-4 bg-gray-200 shadow-sm rounded-md grid comment-list">
-        <div className="w-32 max-sm:h-[42px] md:w-fit py-2 px-3 row-span-2 max-sm:row-start-2 max-sm:row-span-1 col-start-1 col-end-2 flex md:flex-col bg-gray-100 rounded-2xl h-24 justify-between items-center">
+        <div className="w-28 max-sm:h-[42px] md:w-fit py-2 px-3 row-span-2 max-sm:row-start-2 max-sm:row-span-1 col-start-1 col-end-2 flex md:flex-col bg-gray-100 rounded-2xl h-24 justify-between items-center">
           <button
             className="bg-transparent focus:input-outline p-1"
             onClick={() => scoreIncrementOrDecrement(reply.id, "increment")}
@@ -108,8 +124,7 @@ const ReplyList: React.FC<Props> = ({
                 className="w-10 h-10 rounded-full"
               />
             )}
-            <h5 className="text-size-500 font-semibold text-gray-blue-100">
-              {" "}
+            <h5 className="text-size-500 font-semibold text-gray-blue-100 first-letter:capitalize">
               {reply.user.username}
             </h5>
             <p className="text-size-400 text-gray-blue-100 font-normal">
@@ -159,7 +174,7 @@ const ReplyList: React.FC<Props> = ({
           {reply.user.username === currentUser.userName && (
             <>
               <button
-                className="bg-transparent focus:input-outline p-1 w-24 h-fit flex"
+                className="bg-transparent focus:input-outline p-1 w-24 max-sm:w-fit h-fit flex"
                 onClick={() => setIsDeleting({ id: reply.id, status: true })}
               >
                 <img
@@ -167,7 +182,7 @@ const ReplyList: React.FC<Props> = ({
                   alt="delete icon"
                   className="w-4 h-4 mr-2"
                 />
-                <p className="text-size-500 font-semibold text-soft-red uppercase">
+                <p className="max-sm:text-size-400 text-size-500 font-semibold text-soft-red uppercase">
                   delete
                 </p>
               </button>
@@ -176,7 +191,7 @@ const ReplyList: React.FC<Props> = ({
                 onClick={() => setIsEditing(!isEditing)}
               >
                 <img src={editIcon} alt="edit icon" className="w-4 h-4 mr-2" />
-                <p className="text-size-500 font-semibold text-blue uppercase">
+                <p className="max-sm:text-size-400 text-size-500 font-semibold text-blue uppercase">
                   edit
                 </p>
               </button>

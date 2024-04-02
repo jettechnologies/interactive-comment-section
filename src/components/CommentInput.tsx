@@ -36,6 +36,8 @@ const CommentInput:React.FC<Props> = ({
     console.log(newComment)
 
     addComment(newComment);
+
+    setComment("");
   }
 
   return (

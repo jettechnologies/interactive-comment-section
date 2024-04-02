@@ -60,27 +60,33 @@ const commentReducer = (state = initialState, action: Action) => {
  * @param payload The payload containing the comment and reply IDs, and the new content.
  * @returns The updated state.
  */
+
 const updateComment = (
   state: typeof initialState,
-  payload?: Action["payload"] & { id: string; value: string }
+  payload?: Action["payload"] & { id: string, value: string }
 ): typeof initialState => {
-  if (!payload || !payload.id || !payload.value) {
-    return state;
-  }
+  if (!payload || !payload.id) return state;
 
-  const updateCommentContent = (comments: Replies[]): Replies[] => {
-    return comments.map((comment: Replies): Replies => {
+  const updateContent = (comments: Comments[]): Comments[] => {
+    return comments.map((comment) => {
       if (comment.id === payload.id) {
         return { ...comment, content: payload.value };
       }
-      if (comment.replies) {
-        const updatedReplies = updateCommentContent(comment.replies);
-        return { ...comment, replies: updatedReplies };
+      if (comment.replies && comment.replies.length > 0) {
+        // Explicitly cast comment.replies as Replies[]
+        return {
+          ...comment,
+          replies: updateContent(comment.replies as Comments[]),
+        };
       }
       return comment;
     });
   };
-  return state;
+
+  return {
+    ...state,
+    comments: updateContent(state.comments),
+  };
 };
 
 const createReply = (

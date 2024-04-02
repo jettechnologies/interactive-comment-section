@@ -187,15 +187,20 @@ export const CommentProvider: React.FC<{ children: React.ReactNode }> = ({
     dispatch({ type: "REPLY_COMMENT", payload: { id, reply } });
   }, []);
 
-  const editComment = useCallback(
-    (id: string, value: string) => [
-      dispatch({
-        type: "EDIT_COMMENT",
-        payload: { id, value },
-      }),
-    ],
-    []
-  );
+  // const editComment = useCallback(
+  //   (id: string, value: string) => {
+  //     dispatch({
+  //       type: "EDIT_COMMENT",
+  //       payload: { id, value },
+  //     }),
+  //   },
+  //   []
+  // );
+
+  const editComment = useCallback((id: string, value: string) => {
+    console.log(id, value);
+    dispatch({ type: "EDIT_COMMENT", payload: { id, value } });
+  }, []);
 
   const deleteComment = useCallback(
     (id: string) => [

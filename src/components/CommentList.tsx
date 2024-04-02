@@ -10,8 +10,9 @@ import { parse, formatDistanceToNow } from "date-fns";
 import { useState, useEffect } from "react";
 // import CommentInput from "./CommentInput";
 import ReplyInput from "./ReplyInput";
-import useComments from "../context/CommentContext";
 import { getImagePath } from "../utils/imageUtil";
+import useComments from "../context/CommentContext";
+
 import userImgAlt from "../assets/user.png";
 
 interface Props {
@@ -44,6 +45,7 @@ const CommentList: React.FC<Props> = ({
   const { replyComment, editComment, scoreIncrementOrDecrement } =
     useComments();
 
+
   useEffect(() => {
     const loadImage = async (): Promise<void> => {
       try {
@@ -61,6 +63,22 @@ const CommentList: React.FC<Props> = ({
     };
 
     loadImage();
+
+    // const loadImage = async () => {
+    //   try {
+    //       if(comment.user.image.png.includes("images/avatars")){
+    //          /* @vite-ignore */ const { default: userImage } = await import(`./${comment.user.image.png}`);
+    //           setUserImg(userImage);
+
+    //           return
+    //       }
+    //     setUserImg(comment.user.image.png);
+    //   } catch (error) {
+    //     console.error('Error loading image:', error);
+    //   }
+    // };
+
+    // loadImage();
 
     return () => {
       setUserImg(""); // Clear image state when component unmounts
@@ -102,8 +120,7 @@ const CommentList: React.FC<Props> = ({
                 className="w-10 h-10 rounded-full"
               />
             )}
-            <h5 className="text-size-500 font-semibold text-gray-blue-100">
-              {" "}
+            <h5 className="text-size-500 font-semibold text-gray-blue-100 first-letter:capitalize">
               {comment.user.username}
             </h5>
             {comment.user.username === currentUser.userName && (

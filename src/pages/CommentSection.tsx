@@ -33,7 +33,7 @@ const CommentSection = () => {
               .sort((a: Replies, b: Replies) => b.score - a.score)
               .map((reply: Replies) => {
                 return (
-                  <li className="w-[90%] h-fit first:mt-4" key={reply.id}>
+                  <li className="w-[92%] h-fit first:mt-4" key={reply.id}>
                     <ReplyList
                       reply={reply}
                       currentReply={reply}
@@ -50,7 +50,7 @@ const CommentSection = () => {
                             .map((reply: Replies) => {
                               return (
                                 <li
-                                  className="w-[90%] h-fit first:mt-4"
+                                  className="w-[92%] h-fit first:mt-4"
                                   key={reply.id}
                                 >
                                   <ReplyList
@@ -72,7 +72,7 @@ const CommentSection = () => {
   ));
 
   return (
-    <section className="w-full min-h-screen border-2 border-black bg-gray-100 grid gap-y-5 place-items-center py-6">
+    <section className="w-full min-h-screen bg-gray-100 grid gap-y-5 place-items-center py-6">
       <ul className="w-[90%] lg:w-2/3 h-fit flex flex-col gap-y-4">
         {commentList}
       </ul>
@@ -80,11 +80,6 @@ const CommentSection = () => {
         <CommentInput addComment={addComment} currentUser={currentUser} />
       </div>
 
-      {/* <div className="absolute border-2 border-pink-400 inset-0 flex justify-center items-center h-full bg-black opacity-35 z-10">
-        <div className="w-[23rem] h-24 border-2 border-black pt-6 pb-2 px-4  rounded-md bg-white flex flex-col items-center gap-y-4 relative z-40">
-
-        </div>
-      </div> */}
       <Modal
         open={isDeleting.status}
         onClose={() => setIsDeleting({ ...isDeleting, status: false })}
