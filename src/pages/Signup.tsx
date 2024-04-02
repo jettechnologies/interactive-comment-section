@@ -61,7 +61,7 @@ const handleImgUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     img.onload = () => {
       const { height, width } = img;
 
-      if (height > 100 || width > 100) {
+      if (height > 1024 || width > 1024) {
         alert("Image dimensions exceed 100px.");
         setUser(prevUser => {
           return { ...prevUser, imgUrl: { str: ""	, error: false } };
