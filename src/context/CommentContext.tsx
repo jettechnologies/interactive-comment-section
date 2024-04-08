@@ -33,6 +33,44 @@ export const CommentProvider: React.FC<{ children: React.ReactNode }> = ({
   const [state, dispatch] = useReducer(commentReducer, initialState);
   const { setItem } = useLocalStorage("comments");
 
+// Function to convert image file to base64
+// async function convertImageToBase64(imagePath: string): Promise<string> {
+//   const file = await getFileObjectFromPath(imagePath);
+//   return new Promise<string>((resolve, reject) => {
+//       const reader = new FileReader();
+//       reader.onloadend = () => {
+//           const base64String = reader.result as string;
+//           resolve(base64String);
+//       };
+//       reader.onerror = reject;
+//       reader.readAsDataURL(file);
+//   });
+// }
+
+// // Function to get file object from file path (for demonstration purpose only)
+// async function getFileObjectFromPath(path: string): Promise<File> {
+//   // This is a placeholder function to simulate getting file object from path
+//   // In real-world scenarios, you may have a different way to get the file object
+//   // For simplicity, I'm returning a dummy File object here
+//   return new Promise<File>((resolve) => {
+//       // Here you can implement logic to fetch file from path, e.g., using fetch API or other means
+//       // For simplicity, we'll just create a dummy File object with empty data and filename
+//       const filename = path.split("/").pop();
+//       resolve(new File([], filename));
+//   });
+// }
+
+// // Example usage
+// const imagePath = "../images/avatars/image-juliusomo.png";
+// convertImageToBase64(imagePath)
+//   .then((base64String) => {
+//       return base64String; // Here's your base64 encoded image
+//   })
+//   .catch((error) => {
+//       console.error("An error occurred:", error);
+//   });
+
+
   // Function to parse and format human-readable date expressions
   const parseAndFormat = (
     dateExpression: string,

@@ -47,38 +47,38 @@ const CommentList: React.FC<Props> = ({
 
 
   useEffect(() => {
-    const loadImage = async (): Promise<void> => {
-      try {
-        if (comment.user.image.png.includes("images/avatars")) {
-          const userImage = await import(
-            /* @vite-ignore */ getImagePath(comment.user.image.png)
-          );
-          setUserImg(userImage);
-          return;
-        }
-        setUserImg(comment.user.image.png);
-      } catch (error) {
-        console.error("Error loading image:", error);
-      }
-    };
-
-    loadImage();
-
-    // const loadImage = async () => {
+    // const loadImage = async (): Promise<void> => {
     //   try {
-    //       if(comment.user.image.png.includes("images/avatars")){
-    //          /* @vite-ignore */ const { default: userImage } = await import(`./${comment.user.image.png}`);
-    //           setUserImg(userImage);
-
-    //           return
-    //       }
+    //     if (comment.user.image.png.includes("images/avatars")) {
+    //       const userImage = await import(
+    //         /* @vite-ignore */ getImagePath(comment.user.image.png)
+    //       );
+    //       setUserImg(userImage);
+    //       return;
+    //     }
     //     setUserImg(comment.user.image.png);
     //   } catch (error) {
-    //     console.error('Error loading image:', error);
+    //     console.error("Error loading image:", error);
     //   }
     // };
 
     // loadImage();
+
+    const loadImage = async () => {
+      try {
+          if(comment.user.image.png.includes("images/avatars")){
+             /* @vite-ignore */ const { default: userImage } = await import(`./${comment.user.image.png}`);
+              setUserImg(userImage);
+
+              return
+          }
+        setUserImg(comment.user.image.png);
+      } catch (error) {
+        console.error('Error loading image:', error);
+      }
+    };
+
+    loadImage();
 
     return () => {
       setUserImg(""); // Clear image state when component unmounts
